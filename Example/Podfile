@@ -1,5 +1,7 @@
 source 'https://github.com/CocoaPods/Specs.git'
 
+install! 'cocoapods', :deterministic_uuids => false
+
 target 'MWPhotoBrowser_Example' do
   pod "MWPhotoBrowser", :path => "../"
 end
