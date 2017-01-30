@@ -62,7 +62,9 @@
 @property (nonatomic) UIToolbar *customToolbar;
 
 @property (nonatomic) UIImage *navBarBackgroundImageForPortraitOrientation;
-@property (nonatomic) BOOL *hideNavBarHairline;
+@property (nonatomic) BOOL hideNavBarHairline;
+
+@property (nonatomic) BOOL disableAutomaticBarsHiding;
 
 // Init
 - (id)initWithPhotos:(NSArray *)photosArray;

@@ -1082,7 +1082,11 @@ static void * MWVideoPlayerObservation = &MWVideoPlayerObservation;
 }
 
 - (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView {
-	// Hide controls when dragging begins
+    if (self.disableAutomaticBarsHiding) {
+        return;
+    }
+
+    // Hide controls when dragging begins
 	[self setControlsHidden:YES animated:YES permanent:NO];
 }
 
@@ -1547,7 +1551,7 @@ static void * MWVideoPlayerObservation = &MWVideoPlayerObservation;
 
 // Enable/disable control visiblity timer
 - (void)hideControlsAfterDelay {
-	if (![self areControlsHidden]) {
+	if (![self areControlsHidden] && !self.disableAutomaticBarsHiding) {
         [self cancelControlHiding];
 		_controlVisibilityTimer = [NSTimer scheduledTimerWithTimeInterval:self.delayToHideElements target:self selector:@selector(hideControls) userInfo:nil repeats:NO];
 	}
