@@ -210,7 +210,6 @@ static void * MWVideoPlayerObservation = &MWVideoPlayerObservation;
     
     // Setup
     _performingLayout = YES;
-    NSUInteger numberOfPhotos = [self numberOfPhotos];
     
 	// Setup pages
     [_visiblePages removeAllObjects];
@@ -461,10 +460,10 @@ static void * MWVideoPlayerObservation = &MWVideoPlayerObservation;
     UINavigationBar *navBar = self.navigationController.navigationBar;
     navBar.tintColor = [UIColor whiteColor];
     navBar.barTintColor = nil;
-    navBar.shadowImage = nil;
+    navBar.shadowImage = self.hideNavBarHairline ? [UIImage new] : nil;
     navBar.translucent = YES;
-    navBar.barStyle = UIBarStyleBlackTranslucent;
-    [navBar setBackgroundImage:nil forBarMetrics:UIBarMetricsDefault];
+    navBar.barStyle = UIBarStyleBlack;
+    [navBar setBackgroundImage:self.navBarBackgroundImageForPortraitOrientation forBarMetrics:UIBarMetricsDefault];
     [navBar setBackgroundImage:nil forBarMetrics:UIBarMetricsLandscapePhone];
 }
 

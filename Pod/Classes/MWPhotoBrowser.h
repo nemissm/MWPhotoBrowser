@@ -61,6 +61,9 @@
 // Bars customization
 @property (nonatomic) UIToolbar *customToolbar;
 
+@property (nonatomic) UIImage *navBarBackgroundImageForPortraitOrientation;
+@property (nonatomic) BOOL *hideNavBarHairline;
+
 // Init
 - (id)initWithPhotos:(NSArray *)photosArray;
 - (id)initWithDelegate:(id <MWPhotoBrowserDelegate>)delegate;
