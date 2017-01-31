@@ -66,6 +66,9 @@
 
 @property (nonatomic) BOOL disableAutomaticBarsHiding;
 
+// Smoothing. Problem: scaled big images have grain effect. This option decreases it.
+@property (nonatomic) BOOL enableSmoothing;
+
 // Init
 - (id)initWithPhotos:(NSArray *)photosArray;
 - (id)initWithDelegate:(id <MWPhotoBrowserDelegate>)delegate;

@@ -138,6 +138,11 @@
 			
 			// Hide indicator
 			[self hideLoadingIndicator];
+
+            // Smoothing
+            if (_photoBrowser.enableSmoothing) {
+                _photoImageView.layer.minificationFilter = kCAFilterTrilinear;
+            }
 			
 			// Set image
 			_photoImageView.image = img;
