@@ -1134,19 +1134,20 @@ static void * MWVideoPlayerObservation = &MWVideoPlayerObservation;
         _actionButton.tintColor = [UIColor clearColor]; // Tint to hide button
 
         if (self.customToolbar) {
-            [self.customToolbar.items makeObjectsPerformSelector:@selector(setEnabled:) withObject:nil];
-            //self.customToolbar.items.firstObject.enabled = NO;
+            [self.customToolbar.items enumerateObjectsUsingBlock:^(UIBarButtonItem * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+                obj.enabled = NO;
+            }];
         }
     } else {
         _actionButton.enabled = YES;
         _actionButton.tintColor = nil;
 
         if (self.customToolbar) {
-            [self.customToolbar.items makeObjectsPerformSelector:@selector(setEnabled:) withObject:@YES];
-            //self.customToolbar.items.firstObject.enabled = NO;
+            [self.customToolbar.items enumerateObjectsUsingBlock:^(UIBarButtonItem * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+                obj.enabled = YES;
+            }];
         }
     }
-	
 }
 
 - (void)jumpToPageAtIndex:(NSUInteger)index animated:(BOOL)animated {
