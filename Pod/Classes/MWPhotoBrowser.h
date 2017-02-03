@@ -12,7 +12,7 @@
 #import "MWCaptionView.h"
 
 // Debug Logging
-#if 0 // Set to 1 to enable debug logging
+#if 1 // Set to 1 to enable debug logging
 #define MWLog(x, ...) NSLog(x, ## __VA_ARGS__);
 #else
 #define MWLog(x, ...)
@@ -52,6 +52,10 @@
 @property (nonatomic) BOOL autoPlayOnAppear;
 @property (nonatomic) NSUInteger delayToHideElements;
 @property (nonatomic, readonly) NSUInteger currentIndex;
+
+// Zooming transition. Use only for modal presentation.
+@property (nonatomic) UIView *zoomingView;
+@property (nonatomic, readonly) CGRect contentRectForCurrentPageOnPanEnded;
 
 // Customise image selection icons as they are the only icons with a colour tint
 // Icon should be located in the app's main bundle

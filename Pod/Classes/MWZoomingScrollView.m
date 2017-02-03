@@ -40,7 +40,7 @@
 		_tapView = [[MWTapDetectingView alloc] initWithFrame:self.bounds];
 		_tapView.tapDelegate = self;
 		_tapView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-		_tapView.backgroundColor = [UIColor blackColor];
+		_tapView.backgroundColor = [UIColor clearColor];
 		[self addSubview:_tapView];
 		
 		// Image view
@@ -66,7 +66,7 @@
                                                    object:nil];
         
 		// Setup
-		self.backgroundColor = [UIColor blackColor];
+		self.backgroundColor = [UIColor clearColor];
 		self.delegate = self;
 		self.showsHorizontalScrollIndicator = NO;
 		self.showsVerticalScrollIndicator = NO;

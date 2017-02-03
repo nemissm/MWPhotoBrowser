@@ -12,10 +12,17 @@
 #import "MWPhotoBrowserPrivate.h"
 #import "SDImageCache.h"
 #import "UIImage+MWPhotoBrowser.h"
+#import "MWZoomingTransitionDelegate.h"
 
 #define PADDING                  10
 
 static void * MWVideoPlayerObservation = &MWVideoPlayerObservation;
+
+@interface MWPhotoBrowser ()
+
+@property (nonatomic) CGRect contentRectForCurrentPageOnPanEnded;
+
+@end
 
 @implementation MWPhotoBrowser
 
@@ -155,7 +162,7 @@ static void * MWVideoPlayerObservation = &MWVideoPlayerObservation;
 	_pagingScrollView.delegate = self;
 	_pagingScrollView.showsHorizontalScrollIndicator = NO;
 	_pagingScrollView.showsVerticalScrollIndicator = NO;
-	_pagingScrollView.backgroundColor = [UIColor blackColor];
+	_pagingScrollView.backgroundColor = [UIColor clearColor];
     _pagingScrollView.contentSize = [self contentSizeForPagingScrollView];
 	[self.view addSubview:_pagingScrollView];
 	
@@ -189,7 +196,15 @@ static void * MWVideoPlayerObservation = &MWVideoPlayerObservation;
         swipeGesture.direction = UISwipeGestureRecognizerDirectionDown | UISwipeGestureRecognizerDirectionUp;
         [self.view addGestureRecognizer:swipeGesture];
     }
-    
+
+    // Pan gesture
+    if (!self.enableSwipeToDismiss /*&& maybe some separate setting*/) {
+        UIPanGestureRecognizer *panGesture = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(panGestureRecognized:)];
+        panGesture.minimumNumberOfTouches = 1;
+        panGesture.maximumNumberOfTouches = 1;
+        [self.view addGestureRecognizer:panGesture];
+    }
+
 	// Super
     [super viewDidLoad];
 	
@@ -330,10 +345,9 @@ static void * MWVideoPlayerObservation = &MWVideoPlayerObservation;
 #pragma mark - Appearance
 
 - (void)viewWillAppear:(BOOL)animated {
-    
 	// Super
 	[super viewWillAppear:animated];
-    
+
     // Status bar
     if (!_viewHasAppearedInitially) {
         _leaveStatusBarAlone = [self presentingViewControllerPrefersStatusBarHidden];
@@ -390,7 +404,8 @@ static void * MWVideoPlayerObservation = &MWVideoPlayerObservation;
     }
     
     _viewHasAppearedInitially = YES;
-        
+
+    self.navigationController.delegate = self;
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
@@ -424,7 +439,10 @@ static void * MWVideoPlayerObservation = &MWVideoPlayerObservation;
     
 	// Super
 	[super viewWillDisappear:animated];
-    
+
+    if (self.navigationController.delegate == self) {
+        self.navigationController.delegate = nil;
+    }
 }
 
 - (void)willMoveToParentViewController:(UIViewController *)parent {
@@ -446,7 +464,7 @@ static void * MWVideoPlayerObservation = &MWVideoPlayerObservation;
     navBar.barTintColor = nil;
     navBar.shadowImage = nil;
     navBar.translucent = YES;
-    navBar.barStyle = UIBarStyleBlackTranslucent;
+    navBar.barStyle = UIBarStyleBlack;
     [navBar setBackgroundImage:nil forBarMetrics:UIBarMetricsDefault];
     [navBar setBackgroundImage:nil forBarMetrics:UIBarMetricsLandscapePhone];
 }
@@ -808,6 +826,10 @@ static void * MWVideoPlayerObservation = &MWVideoPlayerObservation;
 			if (!page) {
 				page = [[MWZoomingScrollView alloc] initWithPhotoBrowser:self];
 			}
+
+//            page.backgroundColor = [UIColor clearColor];
+//            page.opaque = YES;
+            
 			[_visiblePages addObject:page];
 			[self configurePage:page forIndex:index];
 
@@ -1664,6 +1686,144 @@ static void * MWVideoPlayerObservation = &MWVideoPlayerObservation;
         [self.progressHUD hide:YES];
     }
     self.navigationController.navigationBar.userInteractionEnabled = YES;
+}
+
+#pragma mark - Pan Gesture
+
+- (void)panGestureRecognized:(UIPanGestureRecognizer*)panGesture {
+    // Initial Setup
+    MWZoomingScrollView *page = [self pageDisplayedAtIndex:_currentPageIndex];
+
+    static CGFloat pageCenterX, pageCenterY;
+
+    CGFloat pageHeight = page.frame.size.height;
+    CGFloat pageHalfHeight = pageHeight / 2;
+
+    CGPoint translatedPoint = [panGesture translationInView:self.view];
+
+    // Gesture Began
+    if ([panGesture state] == UIGestureRecognizerStateBegan) {
+        [self setControlsHidden:YES animated:YES permanent:YES];
+
+        pageCenterX = page.center.x;
+        pageCenterY = page.center.y;
+
+        //_senderViewForAnimation.hidden = (_currentPageIndex == _initalPageIndex);
+
+        //_isdraggingPhoto = YES;
+        //[self setNeedsStatusBarAppearanceUpdate];
+    }
+
+    translatedPoint = CGPointMake(pageCenterX, pageCenterY + translatedPoint.y);
+    page.center = translatedPoint;
+
+    float pageYFromCenter = page.center.y - pageHalfHeight;
+    float alpha = 1 - fabsf(pageYFromCenter) / pageHeight; //abs(newY)/viewHeight * 1.8;
+//
+//    self.view.opaque = YES;
+//
+    self.view.backgroundColor = [UIColor colorWithWhite:0 alpha:alpha];
+
+    // Gesture Ended
+    if ([panGesture state] == UIGestureRecognizerStateEnded) {
+        if(page.center.y > pageHalfHeight+40 || page.center.y < pageHalfHeight-40) // Automatic Dismiss View
+        {
+            [self.navigationController dismissViewControllerAnimated:YES completion:nil];
+//            if (_senderViewForAnimation && _currentPageIndex == _initalPageIndex) {
+//                [self performCloseAnimationWithScrollView:scrollView];
+//                return;
+//            }
+//
+//            CGFloat finalX = firstX, finalY;
+//
+//            CGFloat windowsHeigt = [_applicationWindow frame].size.height;
+//
+//            if(scrollView.center.y > viewHalfHeight+30) // swipe down
+//                finalY = windowsHeigt*2;
+//            else // swipe up
+//                finalY = -viewHalfHeight;
+//
+//            CGFloat animationDuration = 0.35;
+//
+//            [UIView beginAnimations:nil context:NULL];
+//            [UIView setAnimationDuration:animationDuration];
+//            [UIView setAnimationCurve:UIViewAnimationCurveEaseIn];
+//            [UIView setAnimationDelegate:self];
+//            [scrollView setCenter:CGPointMake(finalX, finalY)];
+//            self.view.backgroundColor = [UIColor colorWithWhite:0 alpha:0];
+//            [UIView commitAnimations];
+//
+//            [self performSelector:@selector(doneButtonPressed:) withObject:self afterDelay:animationDuration];
+        }
+        else // Continue Showing View
+        {
+//            _isdraggingPhoto = NO;
+//            [self setNeedsStatusBarAppearanceUpdate];
+//
+//            self.view.backgroundColor = [UIColor colorWithWhite:(_useWhiteBackgroundColor ? 1 : 0) alpha:1];
+        NSLog(@"translation: %@, velocity: %@", NSStringFromCGPoint([panGesture translationInView:self.view]), NSStringFromCGPoint([panGesture velocityInView:self.view]));
+
+
+        [self setContentRectForPage:page];
+        NSLog(NSStringFromCGRect(self.contentRectForCurrentPageOnPanEnded));
+//        NSLog(NSStringFromCGRect([page convertRect:page.frame toView:]));
+//        NSLog(NSStringFromCGRect(page.bounds));
+
+        CGFloat velocityY = (.35*[panGesture velocityInView:self.view].y);
+
+//            CGFloat finalX = firstX;
+//            CGFloat finalY = viewHalfHeight;
+
+            //CGFloat animationDuration = (ABS(velocityY)*.0002)+.2;
+        CGFloat gestureTime = [panGesture translationInView:self.view].y / [panGesture velocityInView:self.view].y;
+        CGFloat animationDuration = MIN(gestureTime, 0.3);
+            [UIView animateWithDuration:0.3 animations:^{
+                [page setCenter:CGPointMake(pageCenterX, pageCenterY)];
+                self.view.backgroundColor = [UIColor blackColor];
+            }];
+
+//            [UIView beginAnimations:nil context:NULL];
+//            [UIView setAnimationDuration:animationDuration];
+//            [UIView setAnimationCurve:UIViewAnimationCurveEaseOut];
+//            [UIView setAnimationDelegate:self];
+//
+//            [UIView commitAnimations];
+        }
+    }
+}
+
+- (void)setContentRectForPage:(MWZoomingScrollView *)page {
+    // TODO: Landscape
+    CGFloat x = page.bounds.origin.x;
+    CGFloat width = page.bounds.size.width;
+    CGFloat height = [page.delegate viewForZoomingInScrollView:page].bounds.size.height * page.zoomScale;
+    CGFloat y = page.center.y - height / 2;
+
+    self.contentRectForCurrentPageOnPanEnded = CGRectMake(x, y, width, height);
+}
+
+- (void)setZoomingView:(UIView *)zoomingView {
+    if (_zoomingView != zoomingView) {
+        _zoomingView = zoomingView;
+
+        if (_zoomingView) {
+            self.transitioningDelegate = [MWZoomingTransitionDelegate new];
+            self.modalPresentationStyle = UIModalPresentationCustom;
+        }
+    }
+}
+
+- (id<UIViewControllerAnimatedTransitioning>)navigationController:(UINavigationController *)navigationController
+                                  animationControllerForOperation:(UINavigationControllerOperation)operation
+                                               fromViewController:(UIViewController *)fromVC
+                                                 toViewController:(UIViewController *)toVC {
+    // Check if we're transitioning from this view controller to a DSLSecondViewController
+    if (fromVC == self && [toVC isKindOfClass:[DSLSecondViewController class]]) {
+        return [[DSLTransitionFromFirstToSecond alloc] init];
+    }
+    else {
+        return nil;
+    }
 }
 
 @end

@@ -10,6 +10,13 @@
 #import "Menu.h"
 #import "SDImageCache.h"
 #import "MWCommon.h"
+#import "MWZoomingTransitionProtocol.h"
+
+@interface Menu () <MWZoomingTransitionProtocol>
+
+@property (nonatomic) UIView *viewForZoomingTransition;
+
+@end
 
 @implementation Menu
 
@@ -158,6 +165,8 @@
             cell.imageView.image = [UIImage imageWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"photo1t" ofType:@"jpg"]];
             cell.textLabel.text = @"Test appear animation";
             cell.detailTextLabel.text = @"test";
+
+            self.viewForZoomingTransition = cell.imageView;
             break;
         }
 		default: break;
@@ -387,6 +396,7 @@
     browser.enableSwipeToDismiss = NO;
     browser.autoPlayOnAppear = autoPlayOnAppear;
     [browser setCurrentPhotoIndex:0];
+    browser.zoomingView = self.viewForZoomingTransition;
     
     // Test custom selection images
 //    browser.customImageSelectedIconName = @"ImageSelected.png";
@@ -407,7 +417,12 @@
     } else {
         // Modal
         UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:browser];
-        nc.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
+        //nc.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
+        nc.modalPresentationStyle = UIModalPresentationCustom;
+
+        //self.definesPresentationContext = YES;
+        //self.modalPresentationStyle = UIModalPresentationCurrentContext;
+
         [self presentViewController:nc animated:YES completion:nil];
     }
     
@@ -598,6 +613,12 @@
         
     }
     
+}
+
+#pragma mark - MWZoomingTransitionProtocol
+
+- (UIView *)viewForZooming {
+    return self.viewForZoomingTransition;
 }
 
 @end
