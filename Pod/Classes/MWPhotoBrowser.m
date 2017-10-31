@@ -330,10 +330,10 @@ static void * MWVideoPlayerObservation = &MWVideoPlayerObservation;
 #pragma mark - Appearance
 
 - (void)viewWillAppear:(BOOL)animated {
-    
-	// Super
-	[super viewWillAppear:animated];
-    
+
+    // Super
+    [super viewWillAppear:animated];
+
     // Status bar
     if (!_viewHasAppearedInitially) {
         _leaveStatusBarAlone = [self presentingViewControllerPrefersStatusBarHidden];
@@ -347,32 +347,35 @@ static void * MWVideoPlayerObservation = &MWVideoPlayerObservation;
         _previousStatusBarStyle = [[UIApplication sharedApplication] statusBarStyle];
         [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent animated:animated];
     }
-    
+
     // Navigation bar appearance
     if (!_viewIsActive && [self.navigationController.viewControllers objectAtIndex:0] != self) {
         [self storePreviousNavBarAppearance];
     }
     [self setNavBarAppearance:animated];
-    
+
     // Update UI
-	[self hideControlsAfterDelay];
-    
+    [self hideControlsAfterDelay];
+
     // Initial appearance
     if (!_viewHasAppearedInitially) {
         if (_startOnGrid) {
             [self showGrid:NO];
         }
     }
-    
+
     // If rotation occured while we're presenting a modal
     // and the index changed, make sure we show the right one now
     if (_currentPageIndex != _pageIndexBeforeRotation) {
         [self jumpToPageAtIndex:_pageIndexBeforeRotation animated:NO];
     }
-    
-    // Layout
-    [self.view setNeedsLayout];
 
+    // Layout
+    if (@available(iOS 11.0, *)) {
+        [self layoutVisiblePages];
+    }
+
+    [self.view setNeedsLayout];
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -485,7 +488,12 @@ static void * MWVideoPlayerObservation = &MWVideoPlayerObservation;
 
 - (void)viewWillLayoutSubviews {
     [super viewWillLayoutSubviews];
-    [self layoutVisiblePages];
+
+    if (@available(iOS 11.0, *)) {
+        // do nothing
+    } else {
+        [self layoutVisiblePages];
+    }
 }
 
 - (void)layoutVisiblePages {
