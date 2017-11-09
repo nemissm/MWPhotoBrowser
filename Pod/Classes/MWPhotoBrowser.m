@@ -371,9 +371,11 @@ static void * MWVideoPlayerObservation = &MWVideoPlayerObservation;
     }
 
     // Layout
+    #if __has_builtin(__builtin_available)
     if (@available(iOS 11.0, *)) {
         [self layoutVisiblePages];
     }
+    #endif
 
     [self.view setNeedsLayout];
 }
@@ -489,9 +491,12 @@ static void * MWVideoPlayerObservation = &MWVideoPlayerObservation;
 - (void)viewWillLayoutSubviews {
     [super viewWillLayoutSubviews];
 
+    #if __has_builtin(__builtin_available)
     if (@available(iOS 11.0, *)) {
         // do nothing
-    } else {
+    } else
+    #endif
+    {
         [self layoutVisiblePages];
     }
 }
@@ -1054,11 +1059,13 @@ static void * MWVideoPlayerObservation = &MWVideoPlayerObservation;
 
 - (CGFloat)safeAreaBottomInset {
     CGFloat inset = 0;
+    #if __has_builtin(__builtin_available)
     if (@available(iOS 11.0, *)) {
         //Account for possible notch
         UIEdgeInsets safeArea = [[UIApplication sharedApplication] keyWindow].safeAreaInsets;
         inset = safeArea.bottom;
     }
+    #endif
 
     return inset;
 }
