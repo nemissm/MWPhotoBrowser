@@ -6,7 +6,6 @@
 //  Copyright 2010 d3i. All rights reserved.
 //
 
-#import <SDWebImage/SDWebImageDecoder.h>
 #import <SDWebImage/SDWebImageManager.h>
 #import <SDWebImage/SDWebImageOperation.h>
 #import <AssetsLibrary/AssetsLibrary.h>
@@ -38,7 +37,7 @@
 #pragma mark - Class Methods
 
 + (MWPhoto *)photoWithImage:(UIImage *)image {
-	return [[MWPhoto alloc] initWithImage:image];
+    return [[MWPhoto alloc] initWithImage:image];
 }
 
 + (MWPhoto *)photoWithURL:(NSURL *)url {
@@ -213,30 +212,26 @@
     @try {
         SDWebImageManager *manager = [SDWebImageManager sharedManager];
         _webImageOperation = [manager loadImageWithURL:url
-                                               options:0
-                                              progress:^(NSInteger receivedSize, NSInteger expectedSize, NSURL * _Nullable targetURL) {
-                                                  if (expectedSize > 0) {
-                                                      float progress = receivedSize / (float)expectedSize;
-                                                      NSDictionary* dict = [NSDictionary dictionaryWithObjectsAndKeys:
-                                                                            [NSNumber numberWithFloat:progress], @"progress",
-                                                                            self, @"photo", nil];
-                                                      [[NSNotificationCenter defaultCenter] postNotificationName:MWPHOTO_PROGRESS_NOTIFICATION object:dict];
+                                                   options:0
+                                                  progress:^(NSInteger receivedSize, NSInteger expectedSize, NSURL * _Nullable targetURL) {
+                                                      if (expectedSize > 0) {
+                                                          float progress = receivedSize / (float)expectedSize;
+                                                          NSDictionary* dict = [NSDictionary dictionaryWithObjectsAndKeys:
+                                                                                [NSNumber numberWithFloat:progress], @"progress",
+                                                                                self, @"photo", nil];
+                                                          [[NSNotificationCenter defaultCenter] postNotificationName:MWPHOTO_PROGRESS_NOTIFICATION object:dict];
+                                                      }
                                                   }
-                                              } completed:^(UIImage * _Nullable image,
-                                                            NSData * _Nullable data,
-                                                            NSError * _Nullable error,
-                                                            SDImageCacheType cacheType,
-                                                            BOOL finished,
-                                                            NSURL * _Nullable imageURL) {
-                                                  if (error) {
-                                                      MWLog(@"SDWebImage failed to download image: %@", error);
-                                                  }
-                                                  _webImageOperation = nil;
-                                                  self.underlyingImage = image;
-                                                  dispatch_async(dispatch_get_main_queue(), ^{
-                                                      [self imageLoadingComplete];
-                                                  });
-                                              }];
+                                                 completed:^(UIImage * _Nullable image, NSData * _Nullable data, NSError * _Nullable error, SDImageCacheType cacheType, BOOL finished, NSURL * _Nullable imageURL) {
+                                                     if (error) {
+                                                         MWLog(@"SDWebImage failed to download image: %@", error);
+                                                     }
+                                                     _webImageOperation = nil;
+                                                     self.underlyingImage = image;
+                                                     dispatch_async(dispatch_get_main_queue(), ^{
+                                                         [self imageLoadingComplete];
+                                                     });
+                                                 }];
     } @catch (NSException *e) {
         MWLog(@"Photo from web: %@", e);
         _webImageOperation = nil;
@@ -317,7 +312,7 @@
 // Release if we can get it again from path or url
 - (void)unloadUnderlyingImage {
     _loadingInProgress = NO;
-	self.underlyingImage = nil;
+    self.underlyingImage = nil;
 }
 
 - (void)imageLoadingComplete {
