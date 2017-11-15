@@ -1467,7 +1467,7 @@ static void * MWVideoPlayerObservation = &MWVideoPlayerObservation;
     [self cancelControlHiding];
     
     // Animations & positions
-    CGFloat animatonOffset = 20;
+    CGFloat animatonOffset = 0;
     CGFloat animationDuration = (animated ? 0.35 : 0);
     
     // Status bar
@@ -1483,10 +1483,6 @@ static void * MWVideoPlayerObservation = &MWVideoPlayerObservation;
             
             // View controller based so animate away
             _statusBarShouldBeHidden = hidden;
-            [UIView animateWithDuration:animationDuration animations:^(void) {
-                [self setNeedsStatusBarAppearanceUpdate];
-            } completion:^(BOOL finished) {}];
-            
         }
 
     }
