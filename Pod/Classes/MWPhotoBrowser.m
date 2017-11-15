@@ -427,10 +427,6 @@ static void * MWVideoPlayerObservation = &MWVideoPlayerObservation;
         // State
         _viewIsActive = NO;
         [self clearCurrentVideo]; // Clear current playing video
-        
-        // Bar state / appearance
-        [self restorePreviousNavBarAppearance:animated];
-        
     }
     
     // Controls
@@ -451,6 +447,11 @@ static void * MWVideoPlayerObservation = &MWVideoPlayerObservation;
 - (void)willMoveToParentViewController:(UIViewController *)parent {
     if (parent && _hasBelongedToViewController) {
         [NSException raise:@"MWPhotoBrowser Instance Reuse" format:@"MWPhotoBrowser instances cannot be reused."];
+    }
+
+    // Bar state / appearance
+    if (!parent) {
+        [self restorePreviousNavBarAppearance:YES];
     }
 }
 
