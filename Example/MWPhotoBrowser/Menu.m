@@ -10,9 +10,9 @@
 #import "Menu.h"
 #import "SDImageCache.h"
 #import "MWCommon.h"
-#import "MWZoomingTransitionProtocol.h"
+#import "MWZoomingTransitionDelegate.h"
 
-@interface Menu () <MWZoomingTransitionProtocol>
+@interface Menu ()
 
 @property (nonatomic) UIView *viewForZoomingTransition;
 
@@ -419,6 +419,7 @@
         UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:browser];
         //nc.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
         nc.modalPresentationStyle = UIModalPresentationCustom;
+        //nc.transitioningDelegate = [MWZoomingTransitionDelegate new];
 
         //self.definesPresentationContext = YES;
         //self.modalPresentationStyle = UIModalPresentationCurrentContext;

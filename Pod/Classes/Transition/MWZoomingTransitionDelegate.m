@@ -11,6 +11,12 @@
 
 @implementation MWZoomingTransitionDelegate
 
+- (nullable id <UIViewControllerAnimatedTransitioning>)animationControllerForPresentedController:(UIViewController *)presented
+                                                                            presentingController:(UIViewController *)presenting
+                                                                                sourceController:(UIViewController *)source {
+    return [MWZoomingTransitionAnimator new];
+}
+
 // UIViewControllerTransitioningDelegate
 - (nullable id <UIViewControllerAnimatedTransitioning>)animationControllerForDismissedController:(UIViewController *)dismissed {
     return [MWZoomingTransitionAnimator new];

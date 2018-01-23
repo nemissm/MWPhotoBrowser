@@ -18,9 +18,10 @@
 
 static void * MWVideoPlayerObservation = &MWVideoPlayerObservation;
 
-@interface MWPhotoBrowser ()
+@interface MWPhotoBrowser () <UINavigationControllerDelegate>
 
 @property (nonatomic) CGRect contentRectForCurrentPageOnPanEnded;
+@property (nonatomic) MWZoomingTransitionDelegate *transitionDelegate;
 
 @end
 
@@ -89,6 +90,7 @@ static void * MWVideoPlayerObservation = &MWVideoPlayerObservation;
     _currentGridContentOffset = CGPointMake(0, CGFLOAT_MAX);
     _didSavePreviousStateOfNavBar = NO;
     self.automaticallyAdjustsScrollViewInsets = NO;
+    _transitionDelegate = [MWZoomingTransitionDelegate new];
     
     // Listen for MWPhoto notifications
     [[NSNotificationCenter defaultCenter] addObserver:self
@@ -406,6 +408,9 @@ static void * MWVideoPlayerObservation = &MWVideoPlayerObservation;
     _viewHasAppearedInitially = YES;
 
     self.navigationController.delegate = self;
+    if (self.zoomingView) {
+        self.navigationController.transitioningDelegate = self.transitionDelegate;
+    }
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
@@ -1807,23 +1812,25 @@ static void * MWVideoPlayerObservation = &MWVideoPlayerObservation;
         _zoomingView = zoomingView;
 
         if (_zoomingView) {
-            self.transitioningDelegate = [MWZoomingTransitionDelegate new];
+            self.transitioningDelegate = self.transitionDelegate;
             self.modalPresentationStyle = UIModalPresentationCustom;
         }
     }
 }
 
-- (id<UIViewControllerAnimatedTransitioning>)navigationController:(UINavigationController *)navigationController
-                                  animationControllerForOperation:(UINavigationControllerOperation)operation
-                                               fromViewController:(UIViewController *)fromVC
-                                                 toViewController:(UIViewController *)toVC {
+- (nullable id <UIViewControllerAnimatedTransitioning>)navigationController:(UINavigationController *)navigationController
+                                            animationControllerForOperation:(UINavigationControllerOperation)operation
+                                                         fromViewController:(UIViewController *)fromVC
+                                                           toViewController:(UIViewController *)toVC  {
     // Check if we're transitioning from this view controller to a DSLSecondViewController
-    if (fromVC == self && [toVC isKindOfClass:[DSLSecondViewController class]]) {
-        return [[DSLTransitionFromFirstToSecond alloc] init];
-    }
-    else {
-        return nil;
-    }
+//    if (fromVC == self && [toVC isKindOfClass:[DSLSecondViewController class]]) {
+//        return [[DSLTransitionFromFirstToSecond alloc] init];
+//    }
+//    else {
+//        return nil;
+//    }
+
+    return nil;
 }
 
 @end
