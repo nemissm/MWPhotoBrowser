@@ -465,6 +465,7 @@ static void * MWVideoPlayerObservation = &MWVideoPlayerObservation;
     [self.navigationController setNavigationBarHidden:NO animated:animated];
     UINavigationBar *navBar = self.navigationController.navigationBar;
     navBar.tintColor = [UIColor whiteColor];
+    navBar.titleTextAttributes = @{ NSForegroundColorAttributeName: UIColor.whiteColor };
     navBar.barTintColor = nil;
     navBar.shadowImage = self.hideNavBarHairline ? [UIImage new] : nil;
     navBar.translucent = YES;
@@ -482,6 +483,7 @@ static void * MWVideoPlayerObservation = &MWVideoPlayerObservation;
     _previousNavBarStyle = self.navigationController.navigationBar.barStyle;
     _previousNavigationBarBackgroundImageDefault = [self.navigationController.navigationBar backgroundImageForBarMetrics:UIBarMetricsDefault];
     _previousNavigationBarBackgroundImageLandscapePhone = [self.navigationController.navigationBar backgroundImageForBarMetrics:UIBarMetricsCompact];
+    _previousTitleTextAttributes = self.navigationController.navigationBar.titleTextAttributes;
 }
 
 - (void)restorePreviousNavBarAppearance:(BOOL)animated {
@@ -494,6 +496,7 @@ static void * MWVideoPlayerObservation = &MWVideoPlayerObservation;
         navBar.barStyle = _previousNavBarStyle;
         [navBar setBackgroundImage:_previousNavigationBarBackgroundImageDefault forBarMetrics:UIBarMetricsDefault];
         [navBar setBackgroundImage:_previousNavigationBarBackgroundImageLandscapePhone forBarMetrics:UIBarMetricsCompact];
+        navBar.titleTextAttributes = _previousTitleTextAttributes;
         // Restore back button if we need to
         if (_previousViewControllerBackButton) {
             UIViewController *previousViewController = [self.navigationController topViewController]; // We've disappeared so previous is now top
